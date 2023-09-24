@@ -21,13 +21,13 @@ WORKDIR /src
 COPY ./o2_patch.diff /o2_patch.diff
 RUN patch -p1 < /o2_patch.diff
 
-ARG NUM_JOBS=
+ARG NUM_JOBS=2
 
 RUN export GIT_PYTHON_REFRESH=quiet && \
     python3 -m pip install --break-system-packages requirements_parser && \
     python3 -m pip install --break-system-packages -r etc/pip/compile-requirements.txt && \
     if [ "${NUM_JOBS}" -gt 0 ]; then export JOBS_ARG="-j ${NUM_JOBS}"; fi && \
-    python3 buildscripts/scons.py install-servers MONGO_VERSION="${MONGO_VERSION}" --release --disable-warnings-as-errors -j3 --linker=gold ${JOBS_ARG} && \
+    python3 buildscripts/scons.py install-servers MONGO_VERSION="${MONGO_VERSION}" --release --disable-warnings-as-errors --linker=gold ${JOBS_ARG} && \
     mv build/install /install && \
     strip --strip-debug /install/bin/mongod && \
     strip --strip-debug /install/bin/mongos && \
